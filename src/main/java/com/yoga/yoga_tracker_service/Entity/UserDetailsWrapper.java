@@ -13,6 +13,9 @@ public class UserDetailsWrapper implements UserDetails {
     public UserDetailsWrapper(User user) {
         this.user = user;
     }
+    public Long getId() { // Add this method to get userId
+        return user.getId();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

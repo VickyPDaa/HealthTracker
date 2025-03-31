@@ -1,5 +1,7 @@
 package com.yoga.yoga_tracker_service.Service;
 
+import com.yoga.yoga_tracker_service.DTO.UserDTO;
+import com.yoga.yoga_tracker_service.Entity.Role;
 import com.yoga.yoga_tracker_service.Entity.User;
 import com.yoga.yoga_tracker_service.Repository.UserRepository;
 import com.yoga.yoga_tracker_service.SecurityService.MyUserDetailService;
@@ -24,11 +26,27 @@ public class UserService {
     private MyUserDetailService userDetailService;
     @Autowired
     JwtUtil jwtUtil;
+    @Autowired EmailService emailService;
 
 
-    public User registerUser(User user) {
-        user.setPassword(encoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    public UserDTO registerUser(UserDTO userDTO) {
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new RuntimeException("User with this email already exists!");
+        }
+
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(encoder.encode(userDTO.getPassword())); // Encrypt password
+        user.setRole(userDTO.getRole()); // Default role
+        System.out.println(user.getUsername()+" "+user.getPassword());
+
+        User savedUser = userRepository.save(user);
+
+        // ✅ Step 4: Send welcome email
+        emailService.sendWelcomeEmail(savedUser.getEmail(), savedUser.getUsername());
+
+        return new UserDTO(savedUser.getUsername(),savedUser.getEmail(),savedUser.getPassword(),savedUser.getRole());
     }
 
     public String loginUser(User users) {

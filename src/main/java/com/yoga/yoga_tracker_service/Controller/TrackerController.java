@@ -3,6 +3,7 @@ package com.yoga.yoga_tracker_service.Controller;
 import com.yoga.yoga_tracker_service.DTO.TrackerDTO;
 import com.yoga.yoga_tracker_service.Entity.TrackerSession;
 import com.yoga.yoga_tracker_service.Service.TrackerService;
+import com.yoga.yoga_tracker_service.Utility.AuthenticatedUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,8 @@ public class TrackerController {
 
     @PostMapping
     public ResponseEntity<TrackerDTO> saveUserProgress(@RequestBody TrackerDTO trackerDTO) {
+        Long userId = AuthenticatedUserUtil.getLoggedInUserId();
+        trackerDTO.setUserId(userId);
         TrackerSession savedSession = trackerService.saveOrUpdateTracker(trackerDTO);
         return ResponseEntity.ok(TrackerDTO.fromEntity(savedSession));
     }

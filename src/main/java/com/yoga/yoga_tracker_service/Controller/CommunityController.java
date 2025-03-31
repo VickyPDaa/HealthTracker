@@ -3,6 +3,7 @@ package com.yoga.yoga_tracker_service.Controller;
 import com.yoga.yoga_tracker_service.DTO.CommentDTO;
 import com.yoga.yoga_tracker_service.DTO.CommunityPostDTO;
 import com.yoga.yoga_tracker_service.Service.CommunityService;
+import com.yoga.yoga_tracker_service.Utility.AuthenticatedUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,8 @@ public class CommunityController {
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentDTO> addComment(@PathVariable Long postId, @RequestBody CommentDTO commentDTO) {
+        Long userId = AuthenticatedUserUtil.getLoggedInUserId();
+        commentDTO.setUserId(userId);
         CommentDTO savedComment = communityService.addComment(postId, commentDTO);
         return savedComment != null ? ResponseEntity.status(HttpStatus.CREATED).body(savedComment)
                 : ResponseEntity.notFound().build();
